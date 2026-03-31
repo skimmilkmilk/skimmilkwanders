@@ -342,11 +342,87 @@ body { touch-action: manipulation; }
 #dream.grid-mode::-webkit-scrollbar-thumb { background: rgba(122,170,138,.2); border-radius: 2px; }
 
 @media (max-width: 768px) {
-  #grid-toggle { top: auto; bottom: 68px; right: 16px; font-size: 8px; padding: 6px 10px; }
-  #dream.grid-mode { grid-template-columns: repeat(2, 1fr); padding: 60px 12px 120px; gap: 10px; }
+    #dream.grid-mode { grid-template-columns: repeat(2, 1fr); padding: 60px 12px 120px; gap: 10px; }
+  .f-word { white-space: normal !important; max-width: 44vw; word-break: break-word; line-height: 1.3; }
+  .journal-entry { max-width: 44vw; }
+  #nav { display: none !important; }
+}
+
+/* ── MOBILE MENU BUTTON ── */
+#menu-toggle {
+  position: fixed;
+  top: 24px; right: 36px;
+  z-index: 50;
+  background: none;
+  border: 1px solid rgba(122,170,138,.18);
+  color: rgba(122,170,138,.35);
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+  padding: 7px 14px;
+  cursor: none;
+  transition: all .3s ease;
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+#menu-toggle.show { opacity: 1; pointer-events: all; }
+#menu-toggle:hover { border-color: rgba(122,170,138,.5); color: rgba(122,170,138,.9); }
+#menu-toggle.menu-active {
+  background: rgba(122,170,138,.08);
+  border-color: rgba(122,170,138,.45);
+  color: rgba(122,170,138,.9);
+}
+
+#mobile-menu-dropdown {
+  display: none;
+  position: fixed;
+  z-index: 51;
+  background: rgba(12,11,9,.94);
+  border: 1px solid rgba(122,170,138,.15);
+  flex-direction: column;
+  min-width: 150px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+#mobile-menu-dropdown.open { display: flex; }
+#mobile-menu-dropdown button,
+#mobile-menu-dropdown a {
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(122,170,138,.06);
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
+  color: rgba(122,170,138,.5);
+  padding: 11px 16px;
+  text-align: left;
+  text-decoration: none;
+  cursor: auto;
+  transition: color .2s, background .2s;
+  display: block;
+  line-height: 1;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+#mobile-menu-dropdown button:last-child,
+#mobile-menu-dropdown a:last-child { border-bottom: none; }
+#mobile-menu-dropdown button.mm-active { color: rgba(122,170,138,.9); background: rgba(122,170,138,.05); }
+#mobile-menu-dropdown button:hover,
+#mobile-menu-dropdown a:hover { color: rgba(122,170,138,.9); }
+
+@media (max-width: 768px) {
+  #menu-toggle {
+    display: block;
+    top: auto; bottom: 104px; right: 16px;
+    font-size: 8px; padding: 6px 10px;
+    cursor: auto;
+  }
+  #mobile-menu-dropdown {
+    bottom: 136px; right: 16px;
+  }
 }
 
 /* ── COMING SOON ── */
+
 #coming-soon {
   position: fixed; inset: 0; z-index: 150;
   display: flex; align-items: center; justify-content: center;
@@ -1139,6 +1215,16 @@ body { touch-action: manipulation; }
 </div>
 <div id="hint">move toward things</div>
 <button id="grid-toggle" onclick="toggleGrid()">&#9632;&#9632; grid</button>
+<button id="menu-toggle" onclick="toggleMobileMenu()">&#9776;&#9776; menu</button>
+<div id="mobile-menu-dropdown">
+  <button id="mm-home" onclick="goHome();closeMobileMenu()">&#8962; home</button>
+  <button id="mm-wander" onclick="goRoom('fog');closeMobileMenu()">&#8767; wander</button>
+  <button id="mm-playlist" onclick="goRoom('playlist');closeMobileMenu()">&#9834; playlist</button>
+  <button id="mm-film" onclick="goRoom('film');closeMobileMenu()">&#9632; film</button>
+  <button id="mm-habits" onclick="goRoom('habits');closeMobileMenu()">&#9675; habits</button>
+  <a href="https://drive.google.com/file/d/1Ky3H8DJim2VtVYpqp12KJCXub14L5z5Q/view?usp=sharing" target="_blank" rel="noopener" id="mm-resume">&#8599; resume</a>
+  <a href="https://www.instagram.com/skimmilkmilk" target="_blank" rel="noopener" id="mm-ig">&#64;skimmilkmilk</a>
+</div>
 <div id="nav">
   <button onclick="goHome()">&#8962; home</button>
   <button onclick="goRoom('fog')" class="active">&#8767; wander</button>
@@ -1284,6 +1370,9 @@ function bwOpen() {
   document.getElementById('bw-room').classList.add('open');
   document.getElementById('nav').classList.remove('show');
   document.getElementById('nav-triangle').classList.remove('show');
+  document.getElementById('nav-triangle').classList.remove('show');
+  closeMobileMenu(); document.getElementById('menu-toggle').classList.remove('show');
+  document.getElementById('grid-toggle').style.opacity = '0';
   document.getElementById('grid-toggle').style.opacity = '0';
   document.getElementById('grid-toggle').style.pointerEvents = 'none';
   dream.style.opacity = '0';
@@ -1311,6 +1400,9 @@ function goHome() {
   document.getElementById('film-drag-hint').classList.remove('show');
   document.getElementById('nav').classList.remove('show');
   document.getElementById('nav-triangle').classList.remove('show'); // hide triangle BEFORE coming-soon appears
+  document.getElementById('nav-triangle').classList.remove('show'); // hide triangle BEFORE coming-soon appears
+  closeMobileMenu(); document.getElementById('menu-toggle').classList.remove('show');
+  document.getElementById('site-footer').classList.remove('show');
   document.getElementById('site-footer').classList.remove('show');
   document.getElementById('tl-credit').classList.remove('show'); document.getElementById('last-updated').classList.remove('show');
   document.getElementById('grid-toggle').classList.remove('show');
@@ -1963,9 +2055,17 @@ function goRoom(name) {
   document.getElementById('grid-toggle').classList.remove('grid-active');
   document.getElementById('grid-toggle').innerHTML = '&#9632;&#9632; grid';
   document.getElementById('tl-credit').classList.add('show'); document.getElementById('last-updated').classList.add('show');
+  document.getElementById('grid-toggle').classList.add('show');
+  document.getElementById('menu-toggle').classList.add('show');
+  document.getElementById('tl-credit').classList.add('show');
+  document.getElementById('grid-toggle').classList.add('show');
+  document.getElementById('tl-credit').classList.add('show');
   document.getElementById('nav-triangle').classList.add('show');
-
   var habitRoom = document.getElementById('habit-room');
+  document.getElementById('nav-triangle').classList.add('show');
+  updateMobileMenuActive();
+  var habitRoom = document.getElementById('habit-room');
+
   var filmRoom  = document.getElementById('film-room');
   var navBtns = document.querySelectorAll('#nav button');
   navBtns.forEach(function(b){ b.classList.remove('active'); });
@@ -3035,6 +3135,32 @@ document.getElementById('room-title').addEventListener('click', function() {
   eggClicks++;
   if (eggClicks >= 3) { document.getElementById('egg-modal').classList.add('open'); eggClicks=0; }
 });
+
+// ── MOBILE MENU ──
+function toggleMobileMenu() {
+  var dd = document.getElementById('mobile-menu-dropdown');
+  var btn = document.getElementById('menu-toggle');
+  if (dd.classList.contains('open')) {
+    dd.classList.remove('open');
+    btn.classList.remove('menu-active');
+  } else {
+    updateMobileMenuActive();
+    dd.classList.add('open');
+    btn.classList.add('menu-active');
+  }
+}
+function closeMobileMenu() {
+  var dd = document.getElementById('mobile-menu-dropdown');
+  var btn = document.getElementById('menu-toggle');
+  if (dd) dd.classList.remove('open');
+  if (btn) btn.classList.remove('menu-active');
+}
+function updateMobileMenuActive() {
+  var map = { fog:'mm-wander', playlist:'mm-playlist', film:'mm-film', habits:'mm-habits' };
+  document.querySelectorAll('#mobile-menu-dropdown button').forEach(function(b){ b.classList.remove('mm-active'); });
+  var id = map[currentRoom];
+  if (id) { var el = document.getElementById(id); if (el) el.classList.add('mm-active'); }
+}
 </script>
 </body>
 </html>
