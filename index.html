@@ -1360,11 +1360,23 @@ var W = window.innerWidth, H = window.innerHeight;
 (function(){ var el=document.getElementById('cs-email-link'); if(el){ var e='sskim1290'+String.fromCharCode(64)+'gmail.com'; el.href='mail'+'to:'+e; el.textContent=e; } })();
 
 // ── WARNING TRIANGLE ──
-function uohOpen()    { document.getElementById('uoh-modal').classList.add('open'); document.body.style.overflow='hidden'; }
-function uohClose()   { document.getElementById('uoh-modal').classList.remove('open'); document.body.style.overflow=''; }
+var uohPrevHash = '';
+function uohOpen() {
+  uohPrevHash = window.location.hash;
+  try { history.replaceState(null, '', '#uh-oh'); } catch(e) {}
+  if (typeof gtag !== 'undefined') gtag('event', 'page_view', { page_path: '/#uh-oh', page_title: 'uh oh' });
+  document.getElementById('uoh-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function uohClose() {
+  try { history.replaceState(null, '', uohPrevHash || '#'); } catch(e) {}
+  document.getElementById('uoh-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
 function uohOutside(e){ if(e.target===document.getElementById('uoh-modal')) uohClose(); }
 function uohYes()     { uohClose(); bwOpen(); }
 function uohNo()      { uohClose(); }
+
 
 function bwOpen() {
   document.getElementById('bw-room').classList.add('open');
@@ -3069,8 +3081,22 @@ var HASH_TO_ROOM = { wander:'fog', playlist:'playlist', film:'film', habits:'hab
 var hashRouted = false; // set true when we route via hash, so onEnter skips coming-soon
 function routeFromHash() {
   var hash = window.location.hash.replace('#','').toLowerCase();
+  if (hash === 'uh-oh') {
+    hashRouted = true;
+    var enterEl = document.getElementById('enter');
+    if (enterEl) { enterEl.style.opacity = '0'; enterEl.style.display = 'none'; }
+    entered = true;
+    uohPrevHash = '#';
+    setTimeout(function(){
+      document.getElementById('uoh-modal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (typeof gtag !== 'undefined') gtag('event', 'page_view', { page_path: '/#uh-oh', page_title: 'uh oh' });
+    }, 300);
+    return;
+  }
   var room = HASH_TO_ROOM[hash];
   if (!room) return; // no valid hash — stay on landing
+
   hashRouted = true;
   // Hide the enter screen immediately — user is arriving via direct link, skip the intro
   var enterEl = document.getElementById('enter');
