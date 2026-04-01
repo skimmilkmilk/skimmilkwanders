@@ -1694,7 +1694,9 @@ function onEnter() {
 if (entered) return; entered = true;
 var el = document.getElementById(‘enter’);
 el.style.opacity = ‘0’;
-setTimeout(function(){ el.style.display=‘none’; }, 2000);
+el.style.pointerEvents = ‘none’; // immediately stop blocking taps
+var hideDelay = window.innerWidth <= 768 ? 400 : 2000;
+setTimeout(function(){ el.style.display=‘none’; }, hideDelay);
 // If hash-routing already placed us in a specific room, don’t override with coming-soon
 if (hashRouted) return;
 // Track landing page visit
