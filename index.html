@@ -143,8 +143,8 @@ canvas{position:fixed;inset:0;z-index:0;}
 /* ── PASSWORD GATE ── */
 /* ── WORK ROOM ── */
 
-#c{width:6px;height:6px;border-radius:50%;background:#7aaa8a;position:fixed;z-index:10001;pointer-events:none;transform:translate(-50%,-50%);transition:width .3s,height .3s,background .3s;}
-#cr{width:32px;height:32px;border:1px solid rgba(122,170,138,.35);border-radius:50%;position:fixed;z-index:10000;pointer-events:none;transform:translate(-50%,-50%);transition:width .4s,height .4s,opacity .4s;}
+#c{width:6px;height:6px;border-radius:50%;background:#7aaa8a;position:fixed;z-index:10001;pointer-events:none;transform:translate(-50%,-50%);transition:width .3s,height .3s,background .3s;left:-20px;top:-20px;}
+#cr{width:32px;height:32px;border:1px solid rgba(122,170,138,.35);border-radius:50%;position:fixed;z-index:10000;pointer-events:none;transform:translate(-50%,-50%);transition:width .4s,height .4s,opacity .4s;left:-20px;top:-20px;}
 #dream{position:fixed;inset:0;z-index:10;overflow:hidden;transition:opacity .8s ease;}
 @media(max-width:768px){
 #dream{position:relative;min-height:200vh;overflow:visible;}
@@ -598,6 +598,16 @@ transition: color .3s, border-color .3s;
 .cs-tagline {
 font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
 color: rgba(122,170,138,.18);
+}
+.cs-tap-hint {
+display: none; /* desktop: hidden */
+font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
+color: rgba(122,170,138,.3);
+margin-top: 28px;
+animation: breathe 3s ease-in-out infinite;
+}
+@media (max-width: 768px) {
+.cs-tap-hint { display: block; }
 }
 
 @media (max-width: 768px) {
@@ -1208,6 +1218,7 @@ animation: ht-det-in .22s ease both;
         </div>
       </div>
       <div class="cs-tagline">specialty coffee professional &middot; digital toolmaker</div>
+      <div class="cs-tap-hint">tap to enter</div>
     </div>
   </div>
 </div>
@@ -3384,6 +3395,24 @@ goRoom(room);
 routeFromHash();
 window.addEventListener(‘popstate’, routeFromHash);
 // ─────────────────────────────────────────────────────────────────────────────
+
+// On mobile: tap coming-soon page anywhere to enter wander room
+(function(){
+var cs = document.getElementById(‘coming-soon’);
+if (!cs) return;
+cs.addEventListener(‘click’, function(e) {
+if (e.target.closest(‘a, button’)) return;
+if (currentRoom !== ‘fog’) return;
+cs.classList.remove(‘visible’);
+cs.style.transition = ‘opacity .6s ease’;
+cs.style.opacity = ‘0’;
+setTimeout(function(){ cs.style.display = ‘none’; }, 700);
+uiShowButtons();
+uiShowChrome();
+currentRoom = null;
+goRoom(‘fog’);
+});
+})();
 
 document.getElementById(‘room-title’).addEventListener(‘click’, function() {
 if (currentRoom === ‘fog’) {
