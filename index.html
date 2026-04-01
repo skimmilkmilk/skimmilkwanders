@@ -1700,14 +1700,20 @@ setTimeout(function(){ el.style.display=‘none’; }, enterHideDelay);
 if (hashRouted) return;
 // Track landing page visit
 if (typeof gtag !== ‘undefined’) gtag(‘event’, ‘page_view’, { page_path: ‘/’, page_title: ‘landing’ });
-// Show “wandering” label only after enter screen has faded out
+var wanderDelay = (‘ontouchstart’ in window) ? 0 : 1800;
 setTimeout(function(){
 var rt = document.getElementById(‘room-title’);
 rt.classList.remove(‘room-hidden’);
-}, 1800);
+}, wanderDelay);
 var cs = document.getElementById(‘coming-soon’);
 cs.style.display = ‘flex’;
+if (‘ontouchstart’ in window) {
+cs.style.transition = ‘none’;
+cs.style.opacity = ‘1’;
+cs.classList.add(‘visible’);
+} else {
 setTimeout(function(){ cs.classList.add(‘visible’); }, 600);
+}
 setTimeout(function(){ document.getElementById(‘site-footer’).classList.add(‘show’); }, 2000);
 }
 
