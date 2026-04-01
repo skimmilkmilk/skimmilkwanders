@@ -1651,8 +1651,10 @@ if (!entered) onEnter();
 });
 // hide custom cursor on touch devices
 if (‘ontouchstart’ in window) {
-document.getElementById(‘c’).style.display = ‘none’;
-document.getElementById(‘cr’).style.display = ‘none’;
+var curEl = document.getElementById(‘c’);
+var crEl = document.getElementById(‘cr’);
+if (curEl) { curEl.style.display = ‘none’; curEl.style.left = ‘-100px’; curEl.style.top = ‘-100px’; }
+if (crEl) { crEl.style.display = ‘none’; crEl.style.left = ‘-100px’; crEl.style.top = ‘-100px’; }
 document.body.style.cursor = ‘auto’;
 var eSubEl = document.getElementById(‘e-sub-text’);
 if (eSubEl) eSubEl.textContent = ‘tap or swipe anywhere to begin’;
@@ -1686,15 +1688,23 @@ setTimeout(function(){ el.style.display=‘none’; }, 2000);
 if (hashRouted) return;
 // Track landing page visit
 if (typeof gtag !== ‘undefined’) gtag(‘event’, ‘page_view’, { page_path: ‘/’, page_title: ‘landing’ });
-// Show “wandering” label only after enter screen has faded out
+// Show “wandering” label — faster on mobile
+var wanderDelay = window.innerWidth <= 768 ? 400 : 1800;
 setTimeout(function(){
 var rt = document.getElementById(‘room-title’);
 rt.classList.remove(‘room-hidden’);
-}, 1800);
+}, wanderDelay);
 var cs = document.getElementById(‘coming-soon’);
 cs.style.display = ‘flex’;
+// faster fade on mobile, standard on desktop
+var isMobileEnter = window.innerWidth <= 768;
+if (isMobileEnter) {
+cs.style.transition = ‘opacity .5s ease’;
+cs.classList.add(‘visible’);
+} else {
 setTimeout(function(){ cs.classList.add(‘visible’); }, 600);
-setTimeout(function(){ document.getElementById(‘site-footer’).classList.add(‘show’); }, 2000);
+}
+setTimeout(function(){ document.getElementById(‘site-footer’).classList.add(‘show’); }, isMobileEnter ? 500 : 2000);
 }
 
 function getRooms() {
