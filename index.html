@@ -3398,11 +3398,11 @@ routeFromHash();
 window.addEventListener(‘popstate’, routeFromHash);
 // ─────────────────────────────────────────────────────────────────────────────
 
-// On mobile: tap coming-soon page anywhere to enter wander room
+// Tap coming-soon page anywhere to enter wander room
 (function(){
 var cs = document.getElementById(‘coming-soon’);
 if (!cs) return;
-cs.addEventListener(‘click’, function(e) {
+function enterFromCS(e) {
 if (e.target.closest(‘a, button’)) return;
 if (currentRoom !== ‘fog’) return;
 cs.classList.remove(‘visible’);
@@ -3413,7 +3413,13 @@ uiShowButtons();
 uiShowChrome();
 currentRoom = null;
 goRoom(‘fog’);
-});
+}
+cs.addEventListener(‘click’, enterFromCS);
+cs.addEventListener(‘touchend’, function(e) {
+// only fire if not a scroll
+if (e.changedTouches && e.changedTouches[0]) enterFromCS(e);
+}, {passive:true});
+cs.style.cursor = ‘pointer’;
 })();
 
 document.getElementById(‘room-title’).addEventListener(‘click’, function() {
