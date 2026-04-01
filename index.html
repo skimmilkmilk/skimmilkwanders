@@ -141,8 +141,23 @@ canvas{position:fixed;inset:0;z-index:0;}
 .coffee-detail-body{padding:1.25rem 1.5rem;}
 @media(max-width:520px){.coffee-grid{grid-template-columns:1fr;gap:8px;}}
 /* ── PASSWORD GATE ── */
+#wr-gate{position:fixed;inset:0;z-index:500;background:rgba(15,14,12,.92);display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+#wr-gate.open{display:flex;}
+#wr-gate-box{background:#0f0e0c;border:1px solid rgba(122,170,138,.18);padding:2.5rem 2rem;max-width:340px;width:90%;text-align:center;cursor:auto;}
+#wr-gate-label{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:rgba(122,170,138,.4);margin-bottom:1.25rem;}
+#wr-gate-title{font-size:16px;color:#e8e2d9;margin-bottom:.5rem;font-weight:400;}
+#wr-gate-sub{font-size:11px;color:rgba(232,226,217,.35);margin-bottom:1.75rem;line-height:1.7;}
+#wr-gate-input{width:100%;background:rgba(122,170,138,.05);border:1px solid rgba(122,170,138,.15);color:#e8e2d9;font-family:‘Space Mono’,monospace;font-size:13px;padding:10px 14px;outline:none;text-align:center;letter-spacing:.08em;cursor:text;}
+#wr-gate-input:focus{border-color:rgba(122,170,138,.4);}
+#wr-gate-input::placeholder{color:rgba(232,226,217,.2);letter-spacing:.04em;}
+#wr-gate-err{font-size:10px;color:rgba(200,100,80,.7);margin-top:.75rem;min-height:16px;letter-spacing:.06em;}
+#wr-gate-hint{font-size:9px;color:rgba(122,170,138,.25);margin-top:1.5rem;letter-spacing:.08em;}
+#wr-gate-submit{width:100%;background:rgba(122,170,138,.08);border:1px solid rgba(122,170,138,.2);color:rgba(122,170,138,.9);font-family:‘Space Mono’,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:10px;margin-top:1rem;cursor:pointer;transition:background .3s,border-color .3s;}
+#wr-gate-submit:hover{background:rgba(122,170,138,.15);border-color:rgba(122,170,138,.4);}
+#wr-gate-cancel{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:rgba(232,226,217,.2);background:none;border:none;font-family:‘Space Mono’,monospace;margin-top:.75rem;cursor:pointer;transition:color .3s;display:block;margin-left:auto;margin-right:auto;}
+#wr-gate-cancel:hover{color:rgba(232,226,217,.5);}
 
-#c{width:6px;height:6px;border-radius:50%;background:#7aaa8a;position:fixed;z-index:10001;pointer-events:none;transform:translate(-50%,-50%);transition:width .3s,height .3s,background .3s;}
+#c{width:6px;height:6px;border-radius:50%;background:#7aaa8a;position:fixed;z-index:10001;pointer-events:none;transform:translate(-50%,-50%);transition:width .3s,height .3s,background .3s;left:-20px;top:-20px;}
 #cr{width:32px;height:32px;border:1px solid rgba(122,170,138,.35);border-radius:50%;position:fixed;z-index:10000;pointer-events:none;transform:translate(-50%,-50%);transition:width .4s,height .4s,opacity .4s;}
 #dream{position:fixed;inset:0;z-index:10;overflow:hidden;transition:opacity .8s ease;}
 @media(max-width:768px){
@@ -1359,9 +1374,9 @@ animation: ht-det-in .22s ease both;
   <button onclick="mobMenuGo('playlist')">&#9834; playlist</button>
   <button onclick="mobMenuGo('film')">&#9632; film</button>
   <button onclick="mobMenuGo('habits')">&#9675; habits</button>
-  <button onclick="mobMenuClose();goRoom('work')">&#8960; work with me</button>
+  <button onclick="mobMenuClose();workGate()">&#8960; work with me</button>
   <div class="mob-sep"></div>
-  <a href="https://drive.google.com/file/d/1KtS52THt-j5Y7r_XS5xdbHIlPKxayR47/view?usp=sharing" target="_blank" rel="noopener" onclick="mobMenuClose()">&#8599; resume</a>
+  <a href="https://drive.google.com/file/d/1Ky3H8DJim2VtVYpqp12KJCXub14L5z5Q/view?usp=sharing" target="_blank" rel="noopener" onclick="mobMenuClose()">&#8599; resume</a>
   <a href="https://www.instagram.com/skimmilkmilk" target="_blank" rel="noopener" onclick="mobMenuClose()">&#64;skimmilkmilk</a>
 </div>
 <div id="nav">
@@ -1370,8 +1385,8 @@ animation: ht-det-in .22s ease both;
   <button onclick="goRoom('playlist')">&#9834; playlist</button>
   <button onclick="goRoom('film')">&#9632; film</button>
   <button onclick="goRoom('habits')">&#9675; habits</button>
-  <button onclick="goRoom('work')">&#8960; work with me</button>
-  <a href="https://drive.google.com/file/d/1KtS52THt-j5Y7r_XS5xdbHIlPKxayR47/view?usp=sharing" target="_blank" rel="noopener" id="nav-resume">&#8599; resume</a>
+  <button onclick="workGate()">&#8960; work with me</button>
+  <a href="https://drive.google.com/file/d/1Ky3H8DJim2VtVYpqp12KJCXub14L5z5Q/view?usp=sharing" target="_blank" rel="noopener" id="nav-resume">&#8599; resume</a>
   <a href="https://www.instagram.com/skimmilkmilk" target="_blank" rel="noopener" id="nav-ig">&#64;skimmilkmilk</a>
 </div>
 
@@ -1678,7 +1693,9 @@ function onEnter() {
 if (entered) return; entered = true;
 var el = document.getElementById(‘enter’);
 el.style.opacity = ‘0’;
-setTimeout(function(){ el.style.display=‘none’; }, 2000);
+el.style.pointerEvents = ‘none’;
+var enterHideDelay = (‘ontouchstart’ in window) ? 0 : 2000;
+setTimeout(function(){ el.style.display=‘none’; }, enterHideDelay);
 // If hash-routing already placed us in a specific room, don’t override with coming-soon
 if (hashRouted) return;
 // Track landing page visit
@@ -3695,6 +3712,54 @@ if (coffeeDet) coffeeDet.style.display = ‘none’;
 }
 };
 
+// ── WORK ROOM PASSWORD GATE ──────────────────────────────────────────────
+// Default password: skimmilk
+// To change: open browser console on your site and run:
+//   crypto.subtle.digest(‘SHA-256’,new TextEncoder().encode(‘newpassword’))
+//     .then(b=>console.log([…new Uint8Array(b)].map(x=>x.toString(16).padStart(2,‘0’)).join(’’)))
+// Paste the result as WR_HASH below, save, and redeploy.
+var WR_HASH = ‘fed182ab7616245cd932a48cecc5b266bc18b6a8be7b327f8f0317b29c98d42b’;
+var wrUnlocked = false;
+
+function workGate() {
+if (wrUnlocked) { goRoom(‘work’); return; }
+var gate = document.getElementById(‘wr-gate’);
+gate.classList.add(‘open’);
+document.getElementById(‘wr-gate-err’).textContent = ‘’;
+var inp = document.getElementById(‘wr-gate-input’);
+inp.value = ‘’;
+setTimeout(function(){ inp.focus(); }, 120);
+}
+
+function wrGateClose() {
+document.getElementById(‘wr-gate’).classList.remove(‘open’);
+document.getElementById(‘wr-gate-input’).value = ‘’;
+document.getElementById(‘wr-gate-err’).textContent = ‘’;
+}
+
+async function wrGateCheck() {
+var val = document.getElementById(‘wr-gate-input’).value;
+if (!val) return;
+var buf = await crypto.subtle.digest(‘SHA-256’, new TextEncoder().encode(val));
+var hash = Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,‘0’); }).join(’’);
+if (hash === WR_HASH) {
+wrUnlocked = true;
+wrGateClose();
+goRoom(‘work’);
+} else {
+document.getElementById(‘wr-gate-err’).textContent = ‘not quite — try again’;
+document.getElementById(‘wr-gate-input’).value = ‘’;
+document.getElementById(‘wr-gate-input’).focus();
+}
+}
+
+(function(){
+var gate = document.getElementById(‘wr-gate’);
+if (gate) {
+gate.addEventListener(‘click’, function(e){ if (e.target === gate) wrGateClose(); });
+}
+})();
+
 </script>
 
 <div id="work-room">
@@ -3919,5 +3984,16 @@ if (coffeeDet) coffeeDet.style.display = ‘none’;
 </div>
 </div>
 
+<div id="wr-gate">
+  <div id="wr-gate-box">
+    <div id="wr-gate-label">&#8960; work with me</div>
+    <div id="wr-gate-title">invitation only &mdash; for now</div>
+    <div id="wr-gate-sub">enter the password to continue</div>
+    <input id="wr-gate-input" type="password" placeholder="password" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')wrGateCheck();if(event.key==='Escape')wrGateClose();" />
+    <div id="wr-gate-err"></div>
+    <button id="wr-gate-submit" onclick="wrGateCheck()">unlock &#8767;</button>
+    <button id="wr-gate-cancel" onclick="wrGateClose()">&#8592; go back</button>
+  </div>
+</div>
 </body>
 </html>
