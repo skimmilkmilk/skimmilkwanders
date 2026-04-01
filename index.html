@@ -141,10 +141,9 @@ canvas{position:fixed;inset:0;z-index:0;}
 .coffee-detail-body{padding:1.25rem 1.5rem;}
 @media(max-width:520px){.coffee-grid{grid-template-columns:1fr;gap:8px;}}
 /* ── PASSWORD GATE ── */
-/* ── WORK ROOM ── */
 
-#c{width:6px;height:6px;border-radius:50%;background:#7aaa8a;position:fixed;z-index:10001;pointer-events:none;transform:translate(-50%,-50%);transition:width .3s,height .3s,background .3s;left:-20px;top:-20px;}
-#cr{width:32px;height:32px;border:1px solid rgba(122,170,138,.35);border-radius:50%;position:fixed;z-index:10000;pointer-events:none;transform:translate(-50%,-50%);transition:width .4s,height .4s,opacity .4s;left:-20px;top:-20px;}
+#c{width:6px;height:6px;border-radius:50%;background:#7aaa8a;position:fixed;z-index:10001;pointer-events:none;transform:translate(-50%,-50%);transition:width .3s,height .3s,background .3s;}
+#cr{width:32px;height:32px;border:1px solid rgba(122,170,138,.35);border-radius:50%;position:fixed;z-index:10000;pointer-events:none;transform:translate(-50%,-50%);transition:width .4s,height .4s,opacity .4s;}
 #dream{position:fixed;inset:0;z-index:10;overflow:hidden;transition:opacity .8s ease;}
 @media(max-width:768px){
 #dream{position:relative;min-height:200vh;overflow:visible;}
@@ -598,16 +597,6 @@ transition: color .3s, border-color .3s;
 .cs-tagline {
 font-size: 9px; letter-spacing: .14em; text-transform: uppercase;
 color: rgba(122,170,138,.18);
-}
-.cs-tap-hint {
-display: none; /* desktop: hidden */
-font-size: 9px; letter-spacing: .2em; text-transform: uppercase;
-color: rgba(122,170,138,.3);
-margin-top: 28px;
-animation: breathe 3s ease-in-out infinite;
-}
-@media (max-width: 768px) {
-.cs-tap-hint { display: block; }
 }
 
 @media (max-width: 768px) {
@@ -1192,7 +1181,7 @@ animation: ht-det-in .22s ease both;
 <div id="cr"></div>
 <div id="enter">
   <div class="e-word">wander</div>
-  <div class="e-sub" id="e-sub-text">move your cursor anywhere to begin</div>
+  <div class="e-sub">move your cursor anywhere to begin</div>
 </div>
 
 <!-- COMING SOON OVERLAY — shown after enter, covers everything -->
@@ -1218,7 +1207,6 @@ animation: ht-det-in .22s ease both;
         </div>
       </div>
       <div class="cs-tagline">specialty coffee professional &middot; digital toolmaker</div>
-      <div class="cs-tap-hint">tap to enter</div>
     </div>
   </div>
 </div>
@@ -1662,13 +1650,9 @@ if (!entered) onEnter();
 });
 // hide custom cursor on touch devices
 if (‘ontouchstart’ in window) {
-var curEl = document.getElementById(‘c’);
-var crEl = document.getElementById(‘cr’);
-if (curEl) { curEl.style.display = ‘none’; curEl.style.left = ‘-100px’; curEl.style.top = ‘-100px’; }
-if (crEl) { crEl.style.display = ‘none’; crEl.style.left = ‘-100px’; crEl.style.top = ‘-100px’; }
+document.getElementById(‘c’).style.display = ‘none’;
+document.getElementById(‘cr’).style.display = ‘none’;
 document.body.style.cursor = ‘auto’;
-var eSubEl = document.getElementById(‘e-sub-text’);
-if (eSubEl) eSubEl.textContent = ‘tap or swipe anywhere to begin’;
 }
 (function animRing() {
 crx += (mx-crx)*.09; cry += (my-cry)*.09;
@@ -1694,30 +1678,20 @@ function onEnter() {
 if (entered) return; entered = true;
 var el = document.getElementById(‘enter’);
 el.style.opacity = ‘0’;
-el.style.pointerEvents = ‘none’; // immediately stop blocking taps
-var hideDelay = window.innerWidth <= 768 ? 400 : 2000;
-setTimeout(function(){ el.style.display=‘none’; }, hideDelay);
+setTimeout(function(){ el.style.display=‘none’; }, 2000);
 // If hash-routing already placed us in a specific room, don’t override with coming-soon
 if (hashRouted) return;
 // Track landing page visit
 if (typeof gtag !== ‘undefined’) gtag(‘event’, ‘page_view’, { page_path: ‘/’, page_title: ‘landing’ });
-// Show “wandering” label — faster on mobile
-var wanderDelay = window.innerWidth <= 768 ? 400 : 1800;
+// Show “wandering” label only after enter screen has faded out
 setTimeout(function(){
 var rt = document.getElementById(‘room-title’);
 rt.classList.remove(‘room-hidden’);
-}, wanderDelay);
+}, 1800);
 var cs = document.getElementById(‘coming-soon’);
 cs.style.display = ‘flex’;
-// faster fade on mobile, standard on desktop
-var isMobileEnter = window.innerWidth <= 768;
-if (isMobileEnter) {
-cs.style.transition = ‘opacity .5s ease’;
-cs.classList.add(‘visible’);
-} else {
 setTimeout(function(){ cs.classList.add(‘visible’); }, 600);
-}
-setTimeout(function(){ document.getElementById(‘site-footer’).classList.add(‘show’); }, isMobileEnter ? 500 : 2000);
+setTimeout(function(){ document.getElementById(‘site-footer’).classList.add(‘show’); }, 2000);
 }
 
 function getRooms() {
@@ -2178,14 +2152,6 @@ o.el.style.top  = (o.y + ry*o.dy*52)+‘px’;
 var lastTap = 0, lastTapEl = null;
 document.addEventListener(‘touchstart’, function(e) {
 // update mx/my from touch for proximity checks
-if (e.touches && e.touches[0]) {
-mx = e.touches[0].clientX;
-my = e.touches[0].clientY;
-}
-if (!entered) onEnter();
-}, {passive:true});
-
-document.addEventListener(‘touchmove’, function(e) {
 if (e.touches && e.touches[0]) {
 mx = e.touches[0].clientX;
 my = e.touches[0].clientY;
@@ -3398,30 +3364,6 @@ routeFromHash();
 window.addEventListener(‘popstate’, routeFromHash);
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Tap coming-soon page anywhere to enter wander room
-(function(){
-var cs = document.getElementById(‘coming-soon’);
-if (!cs) return;
-function enterFromCS(e) {
-if (e.target.closest(‘a, button’)) return;
-if (currentRoom !== ‘fog’) return;
-cs.classList.remove(‘visible’);
-cs.style.transition = ‘opacity .6s ease’;
-cs.style.opacity = ‘0’;
-setTimeout(function(){ cs.style.display = ‘none’; }, 700);
-uiShowButtons();
-uiShowChrome();
-currentRoom = null;
-goRoom(‘fog’);
-}
-cs.addEventListener(‘click’, enterFromCS);
-cs.addEventListener(‘touchend’, function(e) {
-// only fire if not a scroll
-if (e.changedTouches && e.changedTouches[0]) enterFromCS(e);
-}, {passive:true});
-cs.style.cursor = ‘pointer’;
-})();
-
 document.getElementById(‘room-title’).addEventListener(‘click’, function() {
 if (currentRoom === ‘fog’) {
 var cs = document.getElementById(‘coming-soon’);
@@ -3752,8 +3694,6 @@ if (el) el.classList.remove(‘oc-active’);
 if (coffeeDet) coffeeDet.style.display = ‘none’;
 }
 };
-
-// ── WORK ROOM ──────────────────────────────────────────────────────────────
 
 </script>
 
