@@ -1182,7 +1182,7 @@ animation: ht-det-in .22s ease both;
 <div id="cr"></div>
 <div id="enter">
   <div class="e-word">wander</div>
-  <div class="e-sub">move your cursor anywhere to begin</div>
+  <div class="e-sub" id="e-sub-text">move your cursor anywhere to begin</div>
 </div>
 
 <!-- COMING SOON OVERLAY — shown after enter, covers everything -->
@@ -1654,6 +1654,8 @@ if (‘ontouchstart’ in window) {
 document.getElementById(‘c’).style.display = ‘none’;
 document.getElementById(‘cr’).style.display = ‘none’;
 document.body.style.cursor = ‘auto’;
+var eSubEl = document.getElementById(‘e-sub-text’);
+if (eSubEl) eSubEl.textContent = ‘tap or swipe anywhere to begin’;
 }
 (function animRing() {
 crx += (mx-crx)*.09; cry += (my-cry)*.09;
@@ -2153,6 +2155,14 @@ o.el.style.top  = (o.y + ry*o.dy*52)+‘px’;
 var lastTap = 0, lastTapEl = null;
 document.addEventListener(‘touchstart’, function(e) {
 // update mx/my from touch for proximity checks
+if (e.touches && e.touches[0]) {
+mx = e.touches[0].clientX;
+my = e.touches[0].clientY;
+}
+if (!entered) onEnter();
+}, {passive:true});
+
+document.addEventListener(‘touchmove’, function(e) {
 if (e.touches && e.touches[0]) {
 mx = e.touches[0].clientX;
 my = e.touches[0].clientY;
